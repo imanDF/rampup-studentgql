@@ -18,8 +18,9 @@ type Query {
 }
 
 type Mutation {
-  createStudent(studentInput: StudentCreateDTO!): Student!
-  updateStudent(student: StudentUpdateDTO!, id: String!): Student!
+  createAllStudents(students: [StudentCreateDTO!]!): [Student!]!
+  createStudent(student: StudentCreateDTO!): Student!
+  updateStudent(student: StudentUpdateDTO!): Student!
   removeStudent(id: String!): Student!
 }
 

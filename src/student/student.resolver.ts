@@ -3,6 +3,8 @@ import {
   Query,
   Mutation,
   Args,
+  ResolveField,
+  Parent,
 } from '@nestjs/graphql';
 import { StudentCreateDTO } from './dto/create-student.input';
 import { StudentUpdateDTO } from './dto/update-student.input';
@@ -17,13 +19,21 @@ export class StudentResolver {
     return this.studentService.findAll();
   }
 
+  @Mutation(() => [Student], { name: 'createAllStudents' })
+  async createAll(
+    @Args({ name: 'students', type: () => [StudentCreateDTO] })
+    students: StudentCreateDTO[],
+  ):Promise<Student[]> {
+    return await this.studentService.saveList(students);
+  }
+
   @Mutation(() => Student, { name: 'createStudent' })
-  create(@Args('studentInput') student: StudentCreateDTO) {
+  create(@Args('student') student: StudentCreateDTO) {
     return this.studentService.create(student);
   }
   @Mutation(() => Student, { name: 'updateStudent' })
-  update(@Args('id') id: string,@Args('student') student: StudentUpdateDTO) {
-    return this.studentService.update(id, student);
+  update(@Args('student') student: StudentUpdateDTO) {
+    return this.studentService.update(student.id, student);
   }
   @Query(() => Student)
   findOne(@Args('id') id: string) {

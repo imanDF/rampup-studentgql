@@ -1,7 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { Repository } from 'typeorm';
+import { getConnection, Repository } from 'typeorm';
+import { resourceLimits } from 'worker_threads';
 import { StudentCreateDTO } from './dto/create-student.input';
 import { StudentUpdateDTO } from './dto/update-student.input';
 import { Student } from './entities/student.entity';
@@ -23,6 +24,21 @@ export class StudentService {
     let stud = this.studentRepository.create(student);
     return this.studentRepository.save(stud);
   }
+
+  async saveList(students: StudentCreateDTO[]): Promise<Student[]> {
+    try {
+      const result = await getConnection()
+        .createQueryBuilder()
+        .insert()
+        .into(Student)
+        .values(students)
+        .execute();
+      return result.identifiers as Student[];
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
   async update(id: string, student: StudentUpdateDTO) {
     let stud = this.studentRepository.create(student);
     stud.id = id;
